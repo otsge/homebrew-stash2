@@ -24,6 +24,14 @@ class Curl < Formula
     regex(/href=.*?curl[._-]v?(.*?)\.t/i)
   end
 
+  bottle do
+    root_url "https://github.com/otsge/homebrew-stash2/releases/download/curl-8.16.0"
+    sha256 cellar: :any, arm64_tahoe:   "f4c03a7b7361830a516eb7c9ab9df46dd0f5c0b9d5a468d96f628ae7c143ae79"
+    sha256 cellar: :any, arm64_sequoia: "666393a675faa093f713ecd89869c711ced8004aff50180280907ef6102a0746"
+    sha256 cellar: :any, arm64_sonoma:  "b251088221baa1936385f44646188ee495ef2cc03bad64b8980533cb189109c2"
+    sha256 cellar: :any, sequoia:       "1be1fb96d2ef9b3fffb0c154ebf0a82d58ef22fc8aaae4101954ac625ed78d61"
+  end
+
   head do
     url "https://github.com/curl/curl.git", branch: "master"
 
