@@ -1,0 +1,32 @@
+name: Homebrew bump packages
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "45 3 * * *"
+
+env:
+  HOMEBREW_DEVELOPER: 1
+  HOMEBREW_NO_ANALYTICS: 1
+
+jobs:
+  autobump:
+    runs-on: macos-latest
+    steps:
+    - name: Set up Homebrew
+      id: set-up-homebrew
+      uses: Homebrew/actions/setup-homebrew@main
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up git
+      uses: Homebrew/actions/git-user-config@main
+      with:
+        username: ${{ github.repository_owner }}
+
+    - name: Bump packages
+      id: autobump
+      run: brew bump --open-pr --full-name --tap "${GITHUB_REPOSITORY}"
+      shell: bash
+      env:
+        HOMEBREW_GITHUB_API_TOKEN: ${{secrets.AUTOBUMP_TOKEN}}
+        HOMEBREW_TEST_BOT_AUTOBUMP: 1

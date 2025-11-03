@@ -1,0 +1,134 @@
+name: brew test-bot
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.rb'
+  pull_request:
+    paths:
+      - '**.rb'
+
+env:
+  HOMEBREW_DEVELOPER: 1
+  HOMEBREW_NO_ANALYTICS: 1
+
+defaults:
+  run:
+    shell: bash -xeuo pipefail {0}
+
+concurrency:
+  group: tests-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - run: brew test-bot --only-tap-syntax
+  test-bot:
+    needs: check-syntax
+    strategy:
+      matrix:
+        os:
+          - macos-14
+          - macos-15
+          - macos-15-intel
+          - macos-26
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+        include:
+          - os: ubuntu-24.04-arm
+            tier2: true
+    runs-on: ${{ matrix.os }}
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      packages: read
+      pull-requests: read
+    steps:
+      - name: Preinstall Homebrew
+        if: matrix.tier2
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup runner
+        run: brew test-bot --only-cleanup-before
+
+      - name: Get cache key
+        id: cache-key
+        run: |
+          cache_key_prefix="${{ runner.os }}"
+          if [ "${{ runner.os }}" == "macOS" ]
+          then
+            macos_version="$(sw_vers -productVersion)"
+            cache_key_prefix="macos${macos_version%%.*}-$(uname -m)"
+          elif [ "${{ runner.os }}" == "Linux" ]
+          then
+            cache_key_prefix="linux-$(uname -m)"
+          fi
+          echo "prefix=${cache_key_prefix}" >> "${GITHUB_OUTPUT}"
+
+      - name: Cache Homebrew Bundler RubyGems
+        id: cache
+        uses: actions/cache@main
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: ${{ steps.cache-key.outputs.prefix }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ steps.cache-key.outputs.prefix }}-rubygems-
+
+      - name: Setup Homebrew test environment
+        if: ${{ ! matrix.tier2 }}
+        run: brew test-bot --only-setup
+
+      - name: Install FUSE-T
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew install --cask otsge/stash2/fuse-t
+
+      - run: |
+          if [[ "${{ runner.arch }}" == "ARM64" ]]; then
+            export HOMEBREW_ARM64_TESTING=1
+          fi
+          if [[ "${{ runner.os }}" == "macOS" && "${{ runner.arch }}" == "X64" ]]
+          then
+            export HOMEBREW_NO_INSTALL_FROM_API=1
+            cp /Users/runner/work/homebrew-stash2/homebrew-stash2/.github/workflows/files/tb_formulae "$(brew --prefix)/Homebrew/Library/Homebrew/test_bot/formulae.rb"
+            brew test-bot --only-formulae
+          else
+            brew test-bot --only-formulae
+          fi
+        name: Build bottle
+        id: build-bottle
+        if: github.event_name == 'pull_request'
+
+      - name: Upload bottles as artifact
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@main
+        with:
+          name: bottles_${{ steps.cache-key.outputs.prefix }}
+          path: '*.bottle.*'
+  label-pr:
+    needs: test-bot
+    if: ${{ startsWith(github.head_ref, 'bump') && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+    - id: label-the-PR
+      env:
+        GH_TOKEN: ${{secrets.AUTOBUMP_TOKEN}}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        gh pr edit "${PR_NUMBER}" --add-label "pr-pull" --repo "otsge/homebrew-stash2"
