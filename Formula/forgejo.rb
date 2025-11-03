@@ -6,6 +6,16 @@ class Forgejo < Formula
   license "GPL-3.0-or-later"
   head "https://codeberg.org/forgejo/forgejo.git", branch: "forgejo"
 
+  bottle do
+    root_url "https://github.com/otsge/homebrew-stash2/releases/download/forgejo-13.0.2"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "48078371485985e83c85c1eb5f7d5c382064a0885afc5fb853b1e8f38ef6c7e1"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "671e4804aed6642c5d1b6fcd734634d840a068818d56d5ece8e3f39955c94ee1"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c12991d6bcfc89f8f43e4f0e0c09000b0c0bcc49112cfa11485a978db950bb76"
+    sha256 cellar: :any_skip_relocation, sequoia:       "8798893a34076dcab65b9252a81ef3aa31a7b6adeac9f9baf577b5fa9c30d562"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "47e3c7c1bb97f20d74810a825a140a6da351c4ed7f08e6d4d0577c19e7ec74aa"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "52bd92631bc8729e3e092cf121e4aa5c487bae5e53c1a8e47526e17013702647"
+  end
+
   depends_on "go" => :build
   depends_on "node" => :build
 
