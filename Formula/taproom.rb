@@ -6,6 +6,16 @@ class Taproom < Formula
   license "MIT"
   head "https://github.com/hzqtc/taproom.git", branch: "main"
 
+  bottle do
+    root_url "https://github.com/otsge/homebrew-stash2/releases/download/taproom-0.4.5"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "92be31aa016cec8d16bfc5072e645a80f2999c5286bd8e730d38edd333e534e3"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "453ed7ed0c49a70c71237ae5d1eede5efc86ca565967970cc0db546da15dbd77"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cd07acd578368e3457a40c9308db5bb70aec5b97519b74b2e1dcb36ea2e841b6"
+    sha256 cellar: :any_skip_relocation, sequoia:       "6c334f513507a23dd0286483e98f989c61baf3979b4cf6ea9e535d20d1dcddd0"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "e8c3b7408a4f55cd4531864630d93c3cc78325fb68d3b8ff4084d7e32384b3d0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ab242bc034f9a7d49dbe807999673b93e92b0ff9ea7185711fde6367f15037f3"
+  end
+
   depends_on "go" => :build
 
   def install
