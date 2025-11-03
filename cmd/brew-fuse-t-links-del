@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#:`brew fuse-t-links-del`
+#:    Delete the links created by fuse-t-links-add (requires sudo)
+
+tee /tmp/fuse-t-uninstall.sh > /dev/null <<EOF
+if [ -L "/usr/local/lib/pkgconfig/fuse.pc" ]; then
+  unlink /usr/local/lib/pkgconfig/fuse.pc
+fi
+
+if [ -L "/usr/local/include/fuse" ]; then
+  unlink /usr/local/include/fuse
+fi
+
+if [ -e "/usr/local/include/fuse.h" ]; then
+  rm /usr/local/include/fuse.h
+  rmdir /usr/local/include 2> /dev/null
+fi
+
+if [ -d "/usr/local/lib/pkgconfig" ]; then
+  rmdir -p /usr/local/lib/pkgconfig 2> /dev/null
+fi
+EOF
+
+chmod +x /tmp/fuse-t-uninstall.sh
+
+sudo "/Library/Application Support/fuse-t/uninstall.sh"; sudo /tmp/fuse-t-uninstall.sh
+
+rm /tmp/fuse-t-uninstall.sh
