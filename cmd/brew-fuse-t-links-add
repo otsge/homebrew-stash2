@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#:`brew fuse-t-links-add`
+#:    Add the necessary symlinks to use FUSE-T as FUSE (requires sudo)
+
+sudo bash <<EOF
+
+if [ ! -e "/usr/local/lib/pkgconfig/fuse.pc" ]; then
+  ln -sf /usr/local/lib/pkgconfig/fuse-t.pc /usr/local/lib/pkgconfig/fuse.pc
+fi
+
+if [ ! -e "/usr/local/include/fuse" ]; then
+  mkdir -p /usr/local/include
+  ln -sf "/Library/Application Support/fuse-t/include/fuse" /usr/local/include/fuse
+fi
+
+if [ ! -e "/usr/local/include/fuse.h" ]; then
+  tee /usr/local/include/fuse.h > /dev/null <<EOF2
+/*
+ This header is for compatibility with older software using FUSE.
+
+ Please use 'pkg-config --cflags fuse' to set include path.  The
+ correct usage is still '#include <fuse.h>', not '#include
+ <fuse/fuse.h>'.
+*/
+
+#include "fuse/fuse.h"
+EOF2
+fi
+EOF
