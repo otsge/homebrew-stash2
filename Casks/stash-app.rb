@@ -8,8 +8,6 @@ cask "stash-app" do
   desc "Organizer for your porn, written in Go"
   homepage "https://stashapp.cc/"
 
-  depends_on macos: ">= :big_sur"
-
   app "Stash.app"
 
   # zap trash: [

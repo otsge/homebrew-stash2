@@ -8,7 +8,6 @@ cask "ccache-gui" do
   homepage "https://github.com/macmade/ccache-gui"
 
   auto_updates true
-  depends_on macos: ">= :high_sierra"
 
   app "ccache.app"
 
