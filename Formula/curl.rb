@@ -4,11 +4,11 @@ class Curl < Formula
   license "curl"
 
   stable do
-    url "https://curl.se/download/curl-8.16.0.tar.bz2"
-    mirror "https://github.com/curl/curl/releases/download/curl-8_16_0/curl-8.16.0.tar.bz2"
-    mirror "http://fresh-center.net/linux/www/curl-8.16.0.tar.bz2"
-    mirror "http://fresh-center.net/linux/www/legacy/curl-8.16.0.tar.bz2"
-    sha256 "9459180ab4933b30d0778ddd71c91fe2911fab731c46e59b3f4c8385b1596c91"
+    url "https://curl.se/download/curl-8.17.0.tar.bz2"
+    mirror "https://github.com/curl/curl/releases/download/curl-8_16_0/curl-8.17.0.tar.bz2"
+    mirror "http://fresh-center.net/linux/www/curl-8.17.0.tar.bz2"
+    mirror "http://fresh-center.net/linux/www/legacy/curl-8.17.0.tar.bz2"
+    sha256 "230032528ce5f85594d4f3eace63364c4244ccc3c801b7f8db1982722f2761f4"
 
     resource "quiche" do
       url "https://github.com/cloudflare/quiche.git",
