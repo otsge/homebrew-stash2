@@ -63,6 +63,8 @@ jobs:
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@main
         with:
+          cask: true
+          core: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup runner
@@ -92,7 +94,10 @@ jobs:
 
       - name: Setup Homebrew test environment
         if: ${{ ! matrix.tier2 }}
-        run: brew test-bot --only-setup
+        run: |
+          brew install jq
+          [[ -e "$(brew tap-info --json homebrew/core | jq -r '.[].path')/Formula/o/openssl@1.1.rb" ]] && rm "$(brew tap-info --json homebrew/core | jq -r '.[].path')/Formula/o/openssl@1.1.rb"
+          brew test-bot --only-setup
 
       - name: Install FUSE-T
         if: ${{ runner.os == 'macOS' }}
