@@ -34,13 +34,19 @@ jobs:
           PULL_REQUEST: ${{ github.event.pull_request.number }}
         run: brew pr-pull --debug --tap="$GITHUB_REPOSITORY" "$PULL_REQUEST"
 
-      - name: Push commits
-        uses: Homebrew/actions/git-try-push@main
-        with:
-          branch: main
+      # - name: Push commits
+      #   uses: Homebrew/actions/git-try-push@main
+      #   with:
+      #     branch: main
 
-      - name: Delete branch
-        if: github.event.pull_request.head.repo.fork == false
+      # - name: Delete branch
+      #   if: github.event.pull_request.head.repo.fork == false
+      #   env:
+      #     BRANCH: ${{ github.event.pull_request.head.ref }}
+      #   run: git push --delete origin "$BRANCH"
+
+      - name: Merge pull request
         env:
-          BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: git push --delete origin "$BRANCH"
+          GH_TOKEN: ${{secrets.AUTOBUMP_TOKEN}}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr merge "${PR_NUMBER}" --delete-branch --squash --repo "${GITHUB_REPOSITORY}"
